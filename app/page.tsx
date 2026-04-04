@@ -87,9 +87,12 @@ export default function KidsAIVideoLanding() {
 
   const selectedPlanData = plans.find((plan) => plan.id === selectedPlan) || plans[0];
 
-  const updateField = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
+  const updateField = (
+  field: keyof typeof form,
+  value: string
+) => {
+  setForm((prev) => ({ ...prev, [field]: value }));
+};
 
   const validate = () => {
     if (!childFile) return "Загрузите фото ребёнка.";
