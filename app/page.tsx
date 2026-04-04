@@ -119,7 +119,6 @@ export default function KidsAIVideoLanding() {
 
   const validate = () => {
     if (!childFile) return "Загрузите фото ребёнка.";
-    if (!companionFile) return "Загрузите фото игрушки или питомца.";
     if (!form.childName.trim()) return "Укажите имя ребёнка.";
     if (!form.childAge) return "Выберите возраст ребёнка.";
     if (!form.wishes.trim()) return "Напишите пожелания к видео.";
@@ -163,8 +162,11 @@ export default function KidsAIVideoLanding() {
       });
 
       const rawText = await response.text();
-      let data: { orderId?: string; confirmationUrl?: string; error?: string } | null =
-        null;
+      let data: {
+        orderId?: string;
+        confirmationUrl?: string;
+        error?: string;
+      } | null = null;
 
       try {
         data = rawText ? JSON.parse(rawText) : null;
@@ -229,13 +231,12 @@ export default function KidsAIVideoLanding() {
               <h1 className="text-5xl md:text-6xl font-bold leading-tight tracking-tight">
                 Создайте{" "}
                 <span className="text-violet-300">волшебное AI-видео</span> с
-                ребёнком, игрушкой или питомцем
+                ребёнком
               </h1>
               <p className="mt-6 text-lg text-slate-300 max-w-2xl leading-8">
                 После нажатия на кнопку вы перейдёте на страницу создания, где
-                сможете выбрать тариф, загрузить фото ребёнка и любимой игрушки
-                или питомца, указать имя, возраст и написать пожелания к будущей
-                истории.
+                сможете выбрать тариф, загрузить фото ребёнка, указать имя,
+                возраст и по желанию добавить любимую игрушку или питомца.
               </p>
               <div className="mt-8">
                 <button
@@ -255,22 +256,25 @@ export default function KidsAIVideoLanding() {
                     1. Выбор подходящего тарифа
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
-                    2. Загрузка фото ребёнка
+                    2. Фото ребёнка
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
-                    3. Загрузка фото игрушки или питомца
+                    3. Имя ребёнка
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
-                    4. Имя ребёнка и возраст
+                    4. Возраст ребёнка
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
-                    5. Имя игрушки или питомца
+                    5. Фото питомца или игрушки (если есть)
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
-                    6. Пожелания к видео
+                    6. Имя питомца или игрушки (если есть)
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
+                    7. Пожелания к видео
                   </div>
                   <div className="rounded-2xl border border-violet-300/20 bg-violet-500/10 px-5 py-4">
-                    7. Счёт на оплату через ЮKassa
+                    8. Счёт на оплату через ЮKassa
                   </div>
                 </div>
               </div>
@@ -307,9 +311,8 @@ export default function KidsAIVideoLanding() {
               Создайте персональное видео для ребёнка
             </h1>
             <p className="mt-5 max-w-3xl text-lg text-slate-300 leading-8">
-              Выберите тариф, загрузите фотографии и расскажите, что именно вы
-              хотите увидеть в истории с вашим ребёнком и его игрушкой или
-              питомцем.
+              Выберите тариф, загрузите фотографию ребёнка и по желанию
+              добавьте питомца или игрушку, которые должны появиться в истории.
             </p>
           </section>
 
@@ -407,13 +410,56 @@ export default function KidsAIVideoLanding() {
 
             <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
               <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
-                3. Фото игрушки или питомца
+                3. Имя ребёнка
+              </div>
+              <label className="block text-lg font-semibold mt-4 mb-3">
+                Имя ребёнка
+              </label>
+              <input
+                type="text"
+                value={form.childName}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  updateField("childName", event.target.value)
+                }
+                placeholder="Например: София"
+                className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-4 text-white placeholder:text-slate-500 outline-none focus:border-violet-300/40"
+              />
+            </section>
+
+            <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
+              <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
+                4. Возраст ребёнка
+              </div>
+              <label className="block text-lg font-semibold mt-4 mb-3">
+                Возраст ребёнка
+              </label>
+              <select
+                value={form.childAge}
+                onChange={(event: ChangeEvent<HTMLSelectElement>) =>
+                  updateField("childAge", event.target.value)
+                }
+                className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-4 text-white outline-none focus:border-violet-300/40"
+              >
+                <option value="">Выберите возраст</option>
+                {ageOptions.map((age) => (
+                  <option key={age} value={age}>
+                    {age} {age === 1 ? "год" : age < 5 ? "года" : "лет"}
+                  </option>
+                ))}
+              </select>
+            </section>
+
+            <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
+              <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
+                5. Фото питомца или игрушки (если есть)
               </div>
               <h2 className="mt-2 text-2xl font-semibold">
-                Загрузите фото любимой игрушки или питомца
+                Загрузите фото питомца или игрушки, если хотите добавить его в
+                видео
               </h2>
               <p className="mt-3 text-slate-300 leading-7">
-                Добавьте того, кто должен появиться в истории вместе с ребёнком.
+                Этот шаг необязательный. Если у ребёнка есть любимая игрушка или
+                питомец, вы можете добавить его в историю.
               </p>
               <label className="mt-6 block rounded-[28px] border border-dashed border-white/15 bg-slate-900/50 p-6 cursor-pointer hover:bg-white/5 transition">
                 <input
@@ -425,7 +471,7 @@ export default function KidsAIVideoLanding() {
                   className="hidden"
                 />
                 <div className="text-base font-medium">
-                  Нажмите, чтобы загрузить фото игрушки или питомца
+                  Нажмите, чтобы загрузить фото питомца или игрушки
                 </div>
                 <div className="mt-2 text-sm text-slate-400">
                   PNG, JPG, WEBP
@@ -435,7 +481,7 @@ export default function KidsAIVideoLanding() {
                 <div className="mt-6 rounded-[28px] border border-white/10 bg-slate-900/50 p-4">
                   <img
                     src={companionPreview}
-                    alt="Фото игрушки или питомца"
+                    alt="Фото питомца или игрушки"
                     className="w-full max-h-[420px] object-contain rounded-[24px]"
                   />
                 </div>
@@ -444,51 +490,10 @@ export default function KidsAIVideoLanding() {
 
             <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
               <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
-                4. Имя ребёнка и возраст
-              </div>
-              <div className="mt-6 grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-lg font-semibold mb-3">
-                    Имя ребёнка
-                  </label>
-                  <input
-                    type="text"
-                    value={form.childName}
-                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                      updateField("childName", event.target.value)
-                    }
-                    placeholder="Например: София"
-                    className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-4 text-white placeholder:text-slate-500 outline-none focus:border-violet-300/40"
-                  />
-                </div>
-                <div>
-                  <label className="block text-lg font-semibold mb-3">
-                    Возраст ребёнка
-                  </label>
-                  <select
-                    value={form.childAge}
-                    onChange={(event: ChangeEvent<HTMLSelectElement>) =>
-                      updateField("childAge", event.target.value)
-                    }
-                    className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-4 text-white outline-none focus:border-violet-300/40"
-                  >
-                    <option value="">Выберите возраст</option>
-                    {ageOptions.map((age) => (
-                      <option key={age} value={age}>
-                        {age} {age === 1 ? "год" : age < 5 ? "года" : "лет"}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </section>
-
-            <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
-              <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
-                5. Имя игрушки или питомца
+                6. Имя питомца или игрушки (если есть)
               </div>
               <label className="block text-lg font-semibold mt-4 mb-3">
-                Имя игрушки или питомца (если есть)
+                Имя питомца или игрушки (если есть)
               </label>
               <input
                 type="text"
@@ -503,18 +508,17 @@ export default function KidsAIVideoLanding() {
 
             <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
               <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
-                6. Пожелания к видео
+                7. Пожелания к видео
               </div>
               <label className="block text-lg font-semibold mt-4 mb-3">
-                Напишите, что вы хотите увидеть в этом видео с вашим ребёнком и
-                игрушкой или питомцем
+                Напишите, что вы хотите увидеть в этом видео с вашим ребёнком
               </label>
               <textarea
                 value={form.wishes}
                 onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
                   updateField("wishes", event.target.value)
                 }
-                placeholder="Например: хочу доброе видео, где ребёнок вместе со своим мишкой путешествует по космосу и находит волшебную планету."
+                placeholder="Например: хочу доброе видео, где ребёнок путешествует по космосу и находит волшебную планету."
                 className="w-full min-h-[180px] rounded-[24px] border border-white/10 bg-slate-900/60 px-4 py-4 text-white placeholder:text-slate-500 outline-none focus:border-violet-300/40 resize-none"
               />
             </section>
@@ -586,7 +590,7 @@ export default function KidsAIVideoLanding() {
                 Возраст ребёнка: {form.childAge}
               </div>
               <div className="rounded-2xl border border-white/10 bg-slate-900/50 px-5 py-4">
-                Имя игрушки / питомца: {form.companionName || "не указано"}
+                Имя питомца / игрушки: {form.companionName || "не указано"}
               </div>
               <div className="rounded-[24px] border border-white/10 bg-slate-900/50 px-5 py-4">
                 <div className="font-medium">Пожелания к видео</div>
@@ -611,16 +615,18 @@ export default function KidsAIVideoLanding() {
               </div>
               <div className="rounded-[24px] border border-white/10 bg-slate-900/50 p-4">
                 <div className="text-sm text-slate-400 mb-3">
-                  Фото игрушки или питомца
+                  Фото питомца или игрушки
                 </div>
                 {companionPreview ? (
                   <img
                     src={companionPreview}
-                    alt="Фото игрушки или питомца"
+                    alt="Фото питомца или игрушки"
                     className="w-full h-56 object-contain rounded-[18px] bg-black/20"
                   />
                 ) : (
-                  <div className="h-56 rounded-[18px] bg-white/5" />
+                  <div className="h-56 rounded-[18px] bg-white/5 flex items-center justify-center text-slate-500 text-sm">
+                    Не добавлено
+                  </div>
                 )}
               </div>
             </div>
@@ -646,7 +652,7 @@ export default function KidsAIVideoLanding() {
             <div className="mt-5 rounded-[24px] border border-white/10 bg-slate-900/50 p-5 text-slate-300 leading-7">
               После успешной оплаты backend должен получить подтверждение оплаты
               и только потом отправить тебе все данные заказа: выбранный тариф,
-              имя ребёнка, возраст, имя игрушки или питомца, пожелания и
+              имя ребёнка, возраст, имя питомца или игрушки, пожелания и
               загруженные фотографии.
             </div>
 
