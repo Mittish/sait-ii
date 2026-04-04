@@ -4,13 +4,12 @@ import { getYookassaAuthHeader } from "@/lib/yookassa";
 
 export const runtime = "nodejs";
 
-const amountFromForm = String(formData.get("amount") || "").trim();
-
 export async function POST(request: Request) {
   try {
-    await ensureStorage();
+    await ensureDirs();
 
     const formData = await request.formData();
+    const amountFromForm = String(formData.get("amount") || "").trim();
 
     const planId = String(formData.get("planId") || "").trim();
 const planTitle = String(formData.get("planTitle") || "").trim();
@@ -26,6 +25,13 @@ const companionPhoto = formData.get("companionPhoto");
 if (!planId || !planTitle || !planDuration || !childName || !childAge || !wishes) {
   return Response.json(
     { error: "Не заполнены обязательные поля формы." },
+    { status: 400 }
+  );
+}
+
+if (!amountFromForm) {
+  return Response.json(
+    { error: "Не передана сумма тарифа." },
     { status: 400 }
   );
 }
@@ -77,7 +83,7 @@ if (!planId || !planTitle || !planDuration || !childName || !childAge || !wishes
       },
       body: JSON.stringify({
         amount: {
-          value: PRICE_RUB,
+          value: amountFromForm,
           currency: "RUB"
         },
         capture: true,
