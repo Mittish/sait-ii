@@ -4,7 +4,7 @@ import { getYookassaAuthHeader } from "@/lib/yookassa";
 
 export const runtime = "nodejs";
 
-const PRICE_RUB = "1990.00";
+const amountFromForm = String(formData.get("amount") || "").trim();
 
 export async function POST(request: Request) {
   try {
@@ -12,19 +12,23 @@ export async function POST(request: Request) {
 
     const formData = await request.formData();
 
-    const videoKind = String(formData.get("videoKind") || "").trim();
-    const videoTitle = String(formData.get("videoTitle") || "").trim();
-    const childName = String(formData.get("childName") || "").trim();
-    const childAge = String(formData.get("childAge") || "").trim();
-    const companionName = String(formData.get("companionName") || "").trim();
-    const wishes = String(formData.get("wishes") || "").trim();
+    const planId = String(formData.get("planId") || "").trim();
+const planTitle = String(formData.get("planTitle") || "").trim();
+const planDuration = String(formData.get("planDuration") || "").trim();
+const childName = String(formData.get("childName") || "").trim();
+const childAge = String(formData.get("childAge") || "").trim();
+const companionName = String(formData.get("companionName") || "").trim();
+const wishes = String(formData.get("wishes") || "").trim();
 
-    const childPhoto = formData.get("childPhoto");
-    const companionPhoto = formData.get("companionPhoto");
+const childPhoto = formData.get("childPhoto");
+const companionPhoto = formData.get("companionPhoto");
 
-    if (!videoKind || !videoTitle || !childName || !childAge || !wishes) {
-      return Response.json({ error: "Не заполнены обязательные поля формы." }, { status: 400 });
-    }
+if (!planId || !planTitle || !planDuration || !childName || !childAge || !wishes) {
+  return Response.json(
+    { error: "Не заполнены обязательные поля формы." },
+    { status: 400 }
+  );
+}
 
     if (!(childPhoto instanceof File)) {
       return Response.json({ error: "Фото ребёнка не загружено." }, { status: 400 });
@@ -43,25 +47,24 @@ export async function POST(request: Request) {
     const childPhotoUrl = await saveUploadedFile(childPhoto, orderId, "child");
     const companionPhotoUrl = await saveUploadedFile(companionPhoto, orderId, "companion");
 
-    const order: OrderRecord = {
-      id: orderId,
-      status: "pending_payment",
-      amount: PRICE_RUB,
-      currency: "RUB",
-      videoKind,
-      videoTitle,
-      childName,
-      childAge,
-      companionName,
-      wishes,
-      childPhotoUrl,
-      companionPhotoUrl,
-      paymentId: null,
-      yookassaStatus: null,
-      amountPaid: null,
-      createdAt: new Date().toISOString(),
-      paidAt: null
-    };
+    const newOrder = {
+  id: orderId,
+  status: "pending_payment",
+  amount: amountFromForm,
+  currency: "RUB",
+  planId,
+  planTitle,
+  planDuration,
+  childName,
+  childAge,
+  companionName,
+  wishes,
+  childPhotoUrl,
+  companionPhotoUrl,
+  paymentId: null,
+  createdAt: new Date().toISOString(),
+  paidAt: null,
+};
 
     await saveOrder(order);
 
@@ -82,7 +85,7 @@ export async function POST(request: Request) {
           type: "redirect",
           return_url: `${siteUrl}?paymentStatus=success&orderId=${orderId}`
         },
-        description: `MagicKid Video order ${orderId}`,
+        description: `${planTitle} — заказ ${orderId}`,
         metadata: {
           order_id: orderId
         }
