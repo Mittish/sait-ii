@@ -1,18 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
+
+type PageState = "landing" | "create" | "invoice" | "success";
+type PlanId = "mini" | "cartoon-story" | "real-story" | "premium";
+
+type FormState = {
+  childName: string;
+  childAge: string;
+  companionName: string;
+  wishes: string;
+};
+
+type Plan = {
+  id: PlanId;
+  title: string;
+  duration: string;
+  description: string;
+  price: number;
+};
 
 export default function KidsAIVideoLanding() {
-  const [page, setPage] = useState("landing");
-  const [selectedPlan, setSelectedPlan] = useState("mini");
-  const [childFile, setChildFile] = useState(null);
-  const [companionFile, setCompanionFile] = useState(null);
-  const [childPreview, setChildPreview] = useState("");
-  const [companionPreview, setCompanionPreview] = useState("");
-  const [orderNumber, setOrderNumber] = useState("");
-  const [errorText, setErrorText] = useState("");
-  const [isCreatingPayment, setIsCreatingPayment] = useState(false);
-  const [form, setForm] = useState({
+  const [page, setPage] = useState<PageState>("landing");
+  const [selectedPlan, setSelectedPlan] = useState<PlanId>("mini");
+  const [childFile, setChildFile] = useState<File | null>(null);
+  const [companionFile, setCompanionFile] = useState<File | null>(null);
+  const [childPreview, setChildPreview] = useState<string>("");
+  const [companionPreview, setCompanionPreview] = useState<string>("");
+  const [orderNumber, setOrderNumber] = useState<string>("");
+  const [errorText, setErrorText] = useState<string>("");
+  const [isCreatingPayment, setIsCreatingPayment] = useState<boolean>(false);
+  const [form, setForm] = useState<FormState>({
     childName: "",
     childAge: "",
     companionName: "",
@@ -44,6 +67,7 @@ export default function KidsAIVideoLanding() {
     const params = new URLSearchParams(window.location.search);
     const paymentStatus = params.get("paymentStatus");
     const returnedOrder = params.get("orderId");
+
     if (paymentStatus === "success") {
       setPage("success");
       if (returnedOrder) {
@@ -54,7 +78,7 @@ export default function KidsAIVideoLanding() {
 
   const ageOptions = Array.from({ length: 15 }, (_, index) => index + 1);
 
-  const plans = [
+  const plans: Plan[] = [
     {
       id: "mini",
       title: "Мини-ролик",
@@ -80,19 +104,18 @@ export default function KidsAIVideoLanding() {
       id: "premium",
       title: "Премиум истории",
       duration: "до 5 минут",
-      description: "Большая персональная история с расширенным сюжетом и более сильным вау-эффектом.",
+      description:
+        "Большая персональная история с расширенным сюжетом и более сильным вау-эффектом.",
       price: 7990,
     },
   ];
 
-  const selectedPlanData = plans.find((plan) => plan.id === selectedPlan) || plans[0];
+  const selectedPlanData =
+    plans.find((plan) => plan.id === selectedPlan) || plans[0];
 
-  const updateField = (
-  field: keyof typeof form,
-  value: string
-) => {
-  setForm((prev) => ({ ...prev, [field]: value }));
-};
+  const updateField = (field: keyof FormState, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
 
   const validate = () => {
     if (!childFile) return "Загрузите фото ребёнка.";
@@ -103,16 +126,18 @@ export default function KidsAIVideoLanding() {
     return "";
   };
 
-  const handleContinue = (event: React.FormEvent<HTMLFormElement>) => {
-  event.preventDefault();
-  const validationError = validate();
-  if (validationError) {
-    setErrorText(validationError);
-    return;
-  }
-  setErrorText("");
-  setPage("invoice");
-};
+  const handleContinue = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const validationError = validate();
+
+    if (validationError) {
+      setErrorText(validationError);
+      return;
+    }
+
+    setErrorText("");
+    setPage("invoice");
+  };
 
   const handleCreatePayment = async () => {
     setErrorText("");
@@ -128,6 +153,7 @@ export default function KidsAIVideoLanding() {
       payload.append("companionName", form.companionName);
       payload.append("wishes", form.wishes);
       payload.append("amount", String(selectedPlanData.price));
+
       if (childFile) payload.append("childPhoto", childFile);
       if (companionFile) payload.append("companionPhoto", companionFile);
 
@@ -137,12 +163,18 @@ export default function KidsAIVideoLanding() {
       });
 
       const rawText = await response.text();
-      let data = null;
+      let data: { orderId?: string; confirmationUrl?: string; error?: string } | null =
+        null;
 
       try {
         data = rawText ? JSON.parse(rawText) : null;
       } catch {
-        throw new Error(`Сервер вернул не JSON. Проверь /api/create-payment. Первые символы ответа: ${rawText.slice(0, 120)}`);
+        throw new Error(
+          `Сервер вернул не JSON. Проверь /api/create-payment. Первые символы ответа: ${rawText.slice(
+            0,
+            120
+          )}`
+        );
       }
 
       if (!response.ok) {
@@ -176,7 +208,9 @@ export default function KidsAIVideoLanding() {
         <header className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between gap-4">
           <div>
             <div className="text-2xl font-bold tracking-tight">Magic Story</div>
-            <div className="text-sm text-slate-300">Персональные AI-видео для детей</div>
+            <div className="text-sm text-slate-300">
+              Персональные AI-видео для детей
+            </div>
           </div>
           <button
             onClick={() => setPage("create")}
@@ -193,10 +227,15 @@ export default function KidsAIVideoLanding() {
                 Видео с вашим ребёнком и его любимыми героями
               </div>
               <h1 className="text-5xl md:text-6xl font-bold leading-tight tracking-tight">
-                Создайте <span className="text-violet-300">волшебное AI-видео</span> с ребёнком, игрушкой или питомцем
+                Создайте{" "}
+                <span className="text-violet-300">волшебное AI-видео</span> с
+                ребёнком, игрушкой или питомцем
               </h1>
               <p className="mt-6 text-lg text-slate-300 max-w-2xl leading-8">
-                После нажатия на кнопку вы перейдёте на страницу создания, где сможете выбрать тариф, загрузить фото ребёнка и любимой игрушки или питомца, указать имя, возраст и написать пожелания к будущей истории.
+                После нажатия на кнопку вы перейдёте на страницу создания, где
+                сможете выбрать тариф, загрузить фото ребёнка и любимой игрушки
+                или питомца, указать имя, возраст и написать пожелания к будущей
+                истории.
               </p>
               <div className="mt-8">
                 <button
@@ -212,13 +251,27 @@ export default function KidsAIVideoLanding() {
               <div className="rounded-[28px] border border-white/10 bg-slate-900/60 p-6">
                 <div className="text-sm text-slate-400">Что будет дальше</div>
                 <div className="mt-6 grid gap-4 text-slate-200">
-                  <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">1. Выбор подходящего тарифа</div>
-                  <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">2. Загрузка фото ребёнка</div>
-                  <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">3. Загрузка фото игрушки или питомца</div>
-                  <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">4. Имя ребёнка и возраст</div>
-                  <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">5. Имя игрушки или питомца</div>
-                  <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">6. Пожелания к видео</div>
-                  <div className="rounded-2xl border border-violet-300/20 bg-violet-500/10 px-5 py-4">7. Счёт на оплату через ЮKassa</div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
+                    1. Выбор подходящего тарифа
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
+                    2. Загрузка фото ребёнка
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
+                    3. Загрузка фото игрушки или питомца
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
+                    4. Имя ребёнка и возраст
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
+                    5. Имя игрушки или питомца
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
+                    6. Пожелания к видео
+                  </div>
+                  <div className="rounded-2xl border border-violet-300/20 bg-violet-500/10 px-5 py-4">
+                    7. Счёт на оплату через ЮKassa
+                  </div>
                 </div>
               </div>
             </div>
@@ -254,16 +307,21 @@ export default function KidsAIVideoLanding() {
               Создайте персональное видео для ребёнка
             </h1>
             <p className="mt-5 max-w-3xl text-lg text-slate-300 leading-8">
-              Выберите тариф, загрузите фотографии и расскажите, что именно вы хотите увидеть в истории с вашим ребёнком и его игрушкой или питомцем.
+              Выберите тариф, загрузите фотографии и расскажите, что именно вы
+              хотите увидеть в истории с вашим ребёнком и его игрушкой или
+              питомцем.
             </p>
           </section>
 
           <form onSubmit={handleContinue} className="grid gap-8">
             <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
-              <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">1. Выбор тарифа</div>
+              <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
+                1. Выбор тарифа
+              </div>
               <div className="mt-6 grid md:grid-cols-2 gap-6">
                 {plans.map((plan) => {
                   const active = selectedPlan === plan.id;
+
                   return (
                     <button
                       key={plan.id}
@@ -277,17 +335,30 @@ export default function KidsAIVideoLanding() {
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div>
-                          <h2 className="text-2xl font-semibold">{plan.title}</h2>
-                          <div className="mt-2 text-sm text-violet-200">{plan.duration}</div>
+                          <h2 className="text-2xl font-semibold">
+                            {plan.title}
+                          </h2>
+                          <div className="mt-2 text-sm text-violet-200">
+                            {plan.duration}
+                          </div>
                         </div>
-                        <div className="text-2xl font-bold text-white whitespace-nowrap">{plan.price} ₽</div>
+                        <div className="text-2xl font-bold text-white whitespace-nowrap">
+                          {plan.price} ₽
+                        </div>
                       </div>
-                      <p className="mt-4 text-slate-300 leading-8">{plan.description}</p>
+                      <p className="mt-4 text-slate-300 leading-8">
+                        {plan.description}
+                      </p>
                       <div className="mt-4 text-slate-200 leading-7">
-                        Каждая история создаётся индивидуально под вашего ребёнка.
+                        Каждая история создаётся индивидуально под вашего
+                        ребёнка.
                       </div>
                       <div className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-violet-200">
-                        <span className={`h-3 w-3 rounded-full ${active ? "bg-violet-300" : "bg-slate-500"}`} />
+                        <span
+                          className={`h-3 w-3 rounded-full ${
+                            active ? "bg-violet-300" : "bg-slate-500"
+                          }`}
+                        />
                         {active ? "Выбрано" : "Нажмите, чтобы выбрать"}
                       </div>
                     </button>
@@ -297,31 +368,50 @@ export default function KidsAIVideoLanding() {
             </section>
 
             <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
-              <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">2. Фото ребёнка</div>
-              <h2 className="mt-2 text-2xl font-semibold">Загрузите фото ребёнка в полный рост и в любимой одежде</h2>
+              <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
+                2. Фото ребёнка
+              </div>
+              <h2 className="mt-2 text-2xl font-semibold">
+                Загрузите фото ребёнка в полный рост и в любимой одежде
+              </h2>
               <p className="mt-3 text-slate-300 leading-7">
-                Чем лучше видно ребёнка на фото, тем точнее и красивее получится образ в видео.
+                Чем лучше видно ребёнка на фото, тем точнее и красивее
+                получится образ в видео.
               </p>
               <label className="mt-6 block rounded-[28px] border border-dashed border-white/15 bg-slate-900/50 p-6 cursor-pointer hover:bg-white/5 transition">
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(event) => setChildFile(event.target.files?.[0] || null)}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    setChildFile(event.target.files?.[0] || null)
+                  }
                   className="hidden"
                 />
-                <div className="text-base font-medium">Нажмите, чтобы загрузить фото ребёнка</div>
-                <div className="mt-2 text-sm text-slate-400">PNG, JPG, WEBP</div>
+                <div className="text-base font-medium">
+                  Нажмите, чтобы загрузить фото ребёнка
+                </div>
+                <div className="mt-2 text-sm text-slate-400">
+                  PNG, JPG, WEBP
+                </div>
               </label>
               {childPreview && (
                 <div className="mt-6 rounded-[28px] border border-white/10 bg-slate-900/50 p-4">
-                  <img src={childPreview} alt="Фото ребёнка" className="w-full max-h-[420px] object-contain rounded-[24px]" />
+                  <img
+                    src={childPreview}
+                    alt="Фото ребёнка"
+                    className="w-full max-h-[420px] object-contain rounded-[24px]"
+                  />
                 </div>
               )}
             </section>
 
             <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
-              <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">3. Фото игрушки или питомца</div>
-              <h2 className="mt-2 text-2xl font-semibold">Загрузите фото любимой игрушки или питомца</h2>
+              <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
+                3. Фото игрушки или питомца
+              </div>
+              <h2 className="mt-2 text-2xl font-semibold">
+                Загрузите фото любимой игрушки или питомца
+              </h2>
               <p className="mt-3 text-slate-300 leading-7">
                 Добавьте того, кто должен появиться в истории вместе с ребёнком.
               </p>
@@ -329,37 +419,57 @@ export default function KidsAIVideoLanding() {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(event) => setCompanionFile(event.target.files?.[0] || null)}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    setCompanionFile(event.target.files?.[0] || null)
+                  }
                   className="hidden"
                 />
-                <div className="text-base font-medium">Нажмите, чтобы загрузить фото игрушки или питомца</div>
-                <div className="mt-2 text-sm text-slate-400">PNG, JPG, WEBP</div>
+                <div className="text-base font-medium">
+                  Нажмите, чтобы загрузить фото игрушки или питомца
+                </div>
+                <div className="mt-2 text-sm text-slate-400">
+                  PNG, JPG, WEBP
+                </div>
               </label>
               {companionPreview && (
                 <div className="mt-6 rounded-[28px] border border-white/10 bg-slate-900/50 p-4">
-                  <img src={companionPreview} alt="Фото игрушки или питомца" className="w-full max-h-[420px] object-contain rounded-[24px]" />
+                  <img
+                    src={companionPreview}
+                    alt="Фото игрушки или питомца"
+                    className="w-full max-h-[420px] object-contain rounded-[24px]"
+                  />
                 </div>
               )}
             </section>
 
             <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
-              <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">4. Имя ребёнка и возраст</div>
+              <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
+                4. Имя ребёнка и возраст
+              </div>
               <div className="mt-6 grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-lg font-semibold mb-3">Имя ребёнка</label>
+                  <label className="block text-lg font-semibold mb-3">
+                    Имя ребёнка
+                  </label>
                   <input
                     type="text"
                     value={form.childName}
-                    onChange={(event) => updateField("childName", event.target.value)}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                      updateField("childName", event.target.value)
+                    }
                     placeholder="Например: София"
                     className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-4 text-white placeholder:text-slate-500 outline-none focus:border-violet-300/40"
                   />
                 </div>
                 <div>
-                  <label className="block text-lg font-semibold mb-3">Возраст ребёнка</label>
+                  <label className="block text-lg font-semibold mb-3">
+                    Возраст ребёнка
+                  </label>
                   <select
                     value={form.childAge}
-                    onChange={(event) => updateField("childAge", event.target.value)}
+                    onChange={(event: ChangeEvent<HTMLSelectElement>) =>
+                      updateField("childAge", event.target.value)
+                    }
                     className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-4 text-white outline-none focus:border-violet-300/40"
                   >
                     <option value="">Выберите возраст</option>
@@ -374,25 +484,36 @@ export default function KidsAIVideoLanding() {
             </section>
 
             <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
-              <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">5. Имя игрушки или питомца</div>
-              <label className="block text-lg font-semibold mt-4 mb-3">Имя игрушки или питомца (если есть)</label>
+              <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
+                5. Имя игрушки или питомца
+              </div>
+              <label className="block text-lg font-semibold mt-4 mb-3">
+                Имя игрушки или питомца (если есть)
+              </label>
               <input
                 type="text"
                 value={form.companionName}
-                onChange={(event) => updateField("companionName", event.target.value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  updateField("companionName", event.target.value)
+                }
                 placeholder="Например: Барсик или Мистер Бобо"
                 className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-4 text-white placeholder:text-slate-500 outline-none focus:border-violet-300/40"
               />
             </section>
 
             <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
-              <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">6. Пожелания к видео</div>
+              <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
+                6. Пожелания к видео
+              </div>
               <label className="block text-lg font-semibold mt-4 mb-3">
-                Напишите, что вы хотите увидеть в этом видео с вашим ребёнком и игрушкой или питомцем
+                Напишите, что вы хотите увидеть в этом видео с вашим ребёнком и
+                игрушкой или питомцем
               </label>
               <textarea
                 value={form.wishes}
-                onChange={(event) => updateField("wishes", event.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  updateField("wishes", event.target.value)
+                }
                 placeholder="Например: хочу доброе видео, где ребёнок вместе со своим мишкой путешествует по космосу и находит волшебную планету."
                 className="w-full min-h-[180px] rounded-[24px] border border-white/10 bg-slate-900/60 px-4 py-4 text-white placeholder:text-slate-500 outline-none focus:border-violet-300/40 resize-none"
               />
@@ -444,18 +565,34 @@ export default function KidsAIVideoLanding() {
 
         <div className="grid lg:grid-cols-[1.15fr_0.85fr] gap-8">
           <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
-            <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">Ваш заказ</div>
-            <h1 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight">Проверьте данные перед оплатой</h1>
+            <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
+              Ваш заказ
+            </div>
+            <h1 className="mt-2 text-3xl md:text-4xl font-bold tracking-tight">
+              Проверьте данные перед оплатой
+            </h1>
 
             <div className="mt-8 grid gap-4 text-slate-200">
-              <div className="rounded-2xl border border-white/10 bg-slate-900/50 px-5 py-4">Тариф: {selectedPlanData.title}</div>
-              <div className="rounded-2xl border border-white/10 bg-slate-900/50 px-5 py-4">Длительность: {selectedPlanData.duration}</div>
-              <div className="rounded-2xl border border-white/10 bg-slate-900/50 px-5 py-4">Имя ребёнка: {form.childName}</div>
-              <div className="rounded-2xl border border-white/10 bg-slate-900/50 px-5 py-4">Возраст ребёнка: {form.childAge}</div>
-              <div className="rounded-2xl border border-white/10 bg-slate-900/50 px-5 py-4">Имя игрушки / питомца: {form.companionName || "не указано"}</div>
+              <div className="rounded-2xl border border-white/10 bg-slate-900/50 px-5 py-4">
+                Тариф: {selectedPlanData.title}
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-slate-900/50 px-5 py-4">
+                Длительность: {selectedPlanData.duration}
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-slate-900/50 px-5 py-4">
+                Имя ребёнка: {form.childName}
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-slate-900/50 px-5 py-4">
+                Возраст ребёнка: {form.childAge}
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-slate-900/50 px-5 py-4">
+                Имя игрушки / питомца: {form.companionName || "не указано"}
+              </div>
               <div className="rounded-[24px] border border-white/10 bg-slate-900/50 px-5 py-4">
                 <div className="font-medium">Пожелания к видео</div>
-                <div className="mt-2 text-slate-300 whitespace-pre-wrap">{form.wishes}</div>
+                <div className="mt-2 text-slate-300 whitespace-pre-wrap">
+                  {form.wishes}
+                </div>
               </div>
             </div>
 
@@ -463,15 +600,25 @@ export default function KidsAIVideoLanding() {
               <div className="rounded-[24px] border border-white/10 bg-slate-900/50 p-4">
                 <div className="text-sm text-slate-400 mb-3">Фото ребёнка</div>
                 {childPreview ? (
-                  <img src={childPreview} alt="Фото ребёнка" className="w-full h-56 object-contain rounded-[18px] bg-black/20" />
+                  <img
+                    src={childPreview}
+                    alt="Фото ребёнка"
+                    className="w-full h-56 object-contain rounded-[18px] bg-black/20"
+                  />
                 ) : (
                   <div className="h-56 rounded-[18px] bg-white/5" />
                 )}
               </div>
               <div className="rounded-[24px] border border-white/10 bg-slate-900/50 p-4">
-                <div className="text-sm text-slate-400 mb-3">Фото игрушки или питомца</div>
+                <div className="text-sm text-slate-400 mb-3">
+                  Фото игрушки или питомца
+                </div>
                 {companionPreview ? (
-                  <img src={companionPreview} alt="Фото игрушки или питомца" className="w-full h-56 object-contain rounded-[18px] bg-black/20" />
+                  <img
+                    src={companionPreview}
+                    alt="Фото игрушки или питомца"
+                    className="w-full h-56 object-contain rounded-[18px] bg-black/20"
+                  />
                 ) : (
                   <div className="h-56 rounded-[18px] bg-white/5" />
                 )}
@@ -480,19 +627,27 @@ export default function KidsAIVideoLanding() {
           </section>
 
           <aside className="rounded-[32px] border border-violet-300/20 bg-violet-500/10 p-7 md:p-8 h-fit">
-            <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">Оплата</div>
+            <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
+              Оплата
+            </div>
             <h2 className="mt-2 text-2xl font-semibold">Счёт через ЮKassa</h2>
 
             <div className="mt-8 rounded-[24px] border border-white/10 bg-slate-950/60 p-6">
               <div className="text-sm text-slate-400">Итого к оплате</div>
-              <div className="mt-2 text-5xl font-bold tracking-tight">{selectedPlanData.price} ₽</div>
+              <div className="mt-2 text-5xl font-bold tracking-tight">
+                {selectedPlanData.price} ₽
+              </div>
               <div className="mt-3 text-slate-300 leading-7">
-                После нажатия кнопки создаётся платёж, и пользователь переходит на защищённую страницу оплаты.
+                После нажатия кнопки создаётся платёж, и пользователь переходит
+                на защищённую страницу оплаты.
               </div>
             </div>
 
             <div className="mt-5 rounded-[24px] border border-white/10 bg-slate-900/50 p-5 text-slate-300 leading-7">
-              После успешной оплаты backend должен получить подтверждение оплаты и только потом отправить тебе все данные заказа: выбранный тариф, имя ребёнка, возраст, имя игрушки или питомца, пожелания и загруженные фотографии.
+              После успешной оплаты backend должен получить подтверждение оплаты
+              и только потом отправить тебе все данные заказа: выбранный тариф,
+              имя ребёнка, возраст, имя игрушки или питомца, пожелания и
+              загруженные фотографии.
             </div>
 
             {errorText && (
@@ -533,7 +688,9 @@ export default function KidsAIVideoLanding() {
             Спасибо, заказ оплачен
           </h1>
           <p className="mt-5 text-lg text-slate-300 leading-8 max-w-2xl mx-auto">
-            После подтверждения оплаты данные заказа должны быть отправлены владельцу сайта автоматически. Номер заказа: {orderNumber || "будет назначен сервером"}.
+            После подтверждения оплаты данные заказа должны быть отправлены
+            владельцу сайта автоматически. Номер заказа:{" "}
+            {orderNumber || "будет назначен сервером"}.
           </p>
           <div className="mt-8 flex justify-center">
             <button
@@ -554,4 +711,3 @@ export default function KidsAIVideoLanding() {
 
   return landingPage;
 }
-
