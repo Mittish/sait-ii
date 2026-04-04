@@ -265,10 +265,10 @@ export default function KidsAIVideoLanding() {
                     4. Возраст ребёнка
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
-                    5. Фото питомца или игрушки (если есть)
+                    5. Фото питомца или игрушки (необезательно)
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
-                    6. Имя питомца или игрушки (если есть)
+                    6. Имя питомца или игрушки (необезательно)
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
                     7. Пожелания к видео
