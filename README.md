@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MagicKid Video
 
-## Getting Started
+Готовый минимальный проект на Next.js:
+- красивая главная страница
+- форма создания видео
+- счёт на оплату через ЮKassa
+- backend для создания платежа
+- webhook для подтверждения оплаты
+- отправка оплаченного заказа в Telegram
+- сохранение фото в `public/uploads`
+- сохранение заказов в `data/orders`
 
-First, run the development server:
+## 1. Установка
+
+Скопируй `.env.example` в `.env.local` и заполни своими значениями.
 
 ```bash
+cp .env.example .env.local
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+После этого открой:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 2. Что заполнить в `.env.local`
 
-## Learn More
+```env
+YOOKASSA_SHOP_ID=твой_shop_id
+YOOKASSA_SECRET_KEY=твой_secret_key
+SITE_URL=https://твойдомен.ру
 
-To learn more about Next.js, take a look at the following resources:
+TELEGRAM_BOT_TOKEN=твой_бот_токен
+TELEGRAM_CHAT_ID=твой_chat_id
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Для локального теста можно временно поставить:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```env
+SITE_URL=http://localhost:3000
+```
 
-## Deploy on Vercel
+## 3. Где лежат важные файлы
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `app/page.tsx` — сайт и форма
+- `app/api/create-payment/route.ts` — создание заказа и платежа
+- `app/api/yookassa-webhook/route.ts` — подтверждение оплаты и отправка тебе заказа
+- `lib/storage.ts` — сохранение фото и заказов
+- `lib/telegram.ts` — отправка заказа в Telegram
+- `lib/yookassa.ts` — работа с API ЮKassa
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 4. Что нужно сделать в кабинете ЮKassa
+
+Настрой webhook на адрес:
+
+```text
+https://твойдомен.ру/api/yookassa-webhook
+```
+
+События:
+- `payment.succeeded`
+- `payment.canceled`
+
+## 5. Важно
+
+Этот стартовый проект хранит фото и заказы на диске сервера.
+Для первого запуска это нормально. Для серьёзного продакшена лучше потом перенести хранение в облачное хранилище и базу данных.
