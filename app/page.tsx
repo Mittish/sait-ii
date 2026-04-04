@@ -103,16 +103,16 @@ export default function KidsAIVideoLanding() {
     return "";
   };
 
-  const handleContinue = (event) => {
-    event.preventDefault();
-    const validationError = validate();
-    if (validationError) {
-      setErrorText(validationError);
-      return;
-    }
-    setErrorText("");
-    setPage("invoice");
-  };
+  const handleContinue = (event: React.FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
+  const validationError = validate();
+  if (validationError) {
+    setErrorText(validationError);
+    return;
+  }
+  setErrorText("");
+  setPage("invoice");
+};
 
   const handleCreatePayment = async () => {
     setErrorText("");
