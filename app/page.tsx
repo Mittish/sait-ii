@@ -451,7 +451,7 @@ export default function KidsAIVideoLanding() {
 
             <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
               <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
-                5. Фото питомца или игрушки (если есть)
+                5. Фото питомца или игрушки (необезательно)
               </div>
               <h2 className="mt-2 text-2xl font-semibold">
                 Загрузите фото питомца или игрушки, если хотите добавить его в
@@ -490,10 +490,10 @@ export default function KidsAIVideoLanding() {
 
             <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
               <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
-                6. Имя питомца или игрушки (если есть)
+                6. Имя питомца или игрушки (необезательно)
               </div>
               <label className="block text-lg font-semibold mt-4 mb-3">
-                Имя питомца или игрушки (если есть)
+                Имя питомца или игрушки (необезательно)
               </label>
               <input
                 type="text"
