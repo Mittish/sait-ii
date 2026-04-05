@@ -694,10 +694,8 @@ export default function KidsAIVideoLanding() {
             Спасибо, заказ оплачен
           </h1>
           <p className="mt-5 text-lg text-slate-300 leading-8 max-w-2xl mx-auto">
-            После подтверждения оплаты данные заказа должны быть отправлены
-            владельцу сайта автоматически. Номер заказа:{" "}
-            {orderNumber || "будет назначен сервером"}.
-          </p>
+  После подтверждения оплаты данные заказа будут отправлены владельцу сайта автоматически.
+</p>
           <div className="mt-8 flex justify-center">
             <button
               onClick={() => setPage("landing")}
