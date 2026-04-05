@@ -223,21 +223,24 @@ export default function KidsAIVideoLanding() {
         </header>
 
         <main className="max-w-6xl mx-auto px-6 pt-10 pb-24">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-slate-200 mb-6">
                 Видео с вашим ребёнком и его любимыми героями
               </div>
+
               <h1 className="text-5xl md:text-6xl font-bold leading-tight tracking-tight">
                 Создайте{" "}
                 <span className="text-violet-300">волшебное AI-видео</span> с
                 ребёнком
               </h1>
+
               <p className="mt-6 text-lg text-slate-300 max-w-2xl leading-8">
                 После нажатия на кнопку вы перейдёте на страницу создания, где
                 сможете выбрать тариф, загрузить фото ребёнка, указать имя,
                 возраст и по желанию добавить любимую игрушку или питомца.
               </p>
+
               <div className="mt-8">
                 <button
                   onClick={() => setPage("create")}
@@ -245,6 +248,38 @@ export default function KidsAIVideoLanding() {
                 >
                   Сделать видео
                 </button>
+              </div>
+
+              <div className="mt-8 grid gap-4">
+                <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
+                  Тарифы Magic Story
+                </div>
+
+                <div className="grid gap-4">
+                  {plans.map((plan) => (
+                    <div
+                      key={plan.id}
+                      className="rounded-[24px] border border-white/10 bg-white/5 px-5 py-5"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <div className="text-xl font-semibold">
+                            {plan.title}
+                          </div>
+                          <div className="mt-1 text-sm text-violet-200">
+                            {plan.duration}
+                          </div>
+                        </div>
+                        <div className="text-2xl font-bold whitespace-nowrap">
+                          {plan.price} ₽
+                        </div>
+                      </div>
+                      <p className="mt-3 text-slate-300 leading-7">
+                        {plan.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -265,10 +300,10 @@ export default function KidsAIVideoLanding() {
                     4. Возраст ребёнка
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
-                    5. Фото питомца или игрушки (необезательно)
+                    5. Фото питомца или игрушки (необязательно)
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
-                    6. Имя питомца или игрушки (необезательно)
+                    6. Имя питомца или игрушки (необязательно)
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
                     7. Пожелания к видео
@@ -451,7 +486,7 @@ export default function KidsAIVideoLanding() {
 
             <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
               <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
-                5. Фото питомца или игрушки (необезательно)
+                5. Фото питомца или игрушки (необязательно)
               </div>
               <h2 className="mt-2 text-2xl font-semibold">
                 Загрузите фото питомца или игрушки, если хотите добавить его в
@@ -490,10 +525,10 @@ export default function KidsAIVideoLanding() {
 
             <section className="rounded-[32px] border border-white/10 bg-white/5 p-7 md:p-8">
               <div className="text-sm uppercase tracking-[0.24em] text-violet-200/80">
-                6. Имя питомца или игрушки (необезательно)
+                6. Имя питомца или игрушки (необязательно)
               </div>
               <label className="block text-lg font-semibold mt-4 mb-3">
-                Имя питомца или игрушки (необезательно)
+                Имя питомца или игрушки (необязательно)
               </label>
               <input
                 type="text"
@@ -650,7 +685,9 @@ export default function KidsAIVideoLanding() {
             </div>
 
             <div className="mt-5 rounded-[24px] border border-white/10 bg-slate-900/50 p-5 text-slate-300 leading-7">
-              После успешной оплаты ваш заказ сразу поступает в работу. Мы используем ваши фотографии, имя ребёнка, возраст и пожелания, чтобы создать персональное видео.
+              После успешной оплаты ваш заказ сразу поступает в работу. Мы
+              используем ваши фотографии, имя ребёнка, возраст и пожелания,
+              чтобы создать персональное видео.
             </div>
 
             {errorText && (
@@ -691,8 +728,9 @@ export default function KidsAIVideoLanding() {
             Спасибо, заказ оплачен
           </h1>
           <p className="mt-5 text-lg text-slate-300 leading-8 max-w-2xl mx-auto">
-  После подтверждения оплаты данные заказа будут отправлены владельцу сайта автоматически.
-</p>
+            После подтверждения оплаты данные заказа будут отправлены владельцу
+            сайта автоматически.
+          </p>
           <div className="mt-8 flex justify-center">
             <button
               onClick={() => setPage("landing")}
