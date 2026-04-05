@@ -97,17 +97,13 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!(companionPhoto instanceof File)) {
-      return Response.json(
-        { error: "Фото игрушки или питомца не загружено." },
-        { status: 400 }
-      );
-    }
-
     const orderId = crypto.randomUUID();
 
     const childPhotoUrl = await saveUploadedFile(childPhoto, orderId, "child");
-    const companionPhotoUrl = await saveUploadedFile(companionPhoto, orderId, "companion");
+const companionPhotoUrl =
+  companionPhoto instanceof File
+    ? await saveUploadedFile(companionPhoto, orderId, "companion")
+    : null;
 
     const newOrder = {
       id: orderId,
